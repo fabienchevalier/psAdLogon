@@ -1,3 +1,4 @@
+#Requires -RunAsAdministrator
 <#            ___      _ _                             
             / _ \    | | |                            
  _ __  ___ / /_\ \ __| | |     ___   __ _  ___  _ __  
@@ -15,7 +16,7 @@ Usage       : Check the GitHub page to learn how to use this script
 
 # -> Parameter definition
 
-Param(
+Param( 
     [String]$User #Use this parameter to choose from wich user you wish to see logon history.
     [String]$L #Use this parameter to check last logon activity on the local AD server (ex ./psAdLogon -L -User John)
     [Int]$D #Use this parameter to set the amount of days you wanna look back (ex ./psAdLogon -D 12 -User John)
@@ -24,21 +25,6 @@ Param(
 )
 
 # <- End of parameter definition
-
-# -> Check prerequisites
-Function CheckPrerequisites{
-    If (Get-Command Get-ADDomainController -errorAction SilentlyContinue)
-    {
-        Write-Host -ForegroundColor Green  "ADDomainController exists : OK"
-    }
-    ElseIf (Get-Command $Get-ADUser -errorAction SilentlyContinue)
-    {
-        Write-Host -ForegroundColor Green  "ADUser exists : OK"
-    }
-
-
-}
-# <- End of check prerequisites
 
 # -> Global Var
 
@@ -73,11 +59,11 @@ Function psAllLogon {
             Write-Host "Processing..."
             ForEach ($Log in $Logs)
             { 
-                If ($Log.InstanceId -eq 4624)
+                If ($Log.InstanceId -eq 7001)
                     {
                         $ET = "Logon"
                     }
-                ElseIf ($Log.InstanceId -eq 4634)
+                ElseIf ($Log.InstanceId -eq 7002)
                     { 
                         $ET = "Logoff"
                     }
@@ -100,7 +86,7 @@ Function psAdLogon {
     $HostName = $DCs.HostName
 
     ## Get SystemLog
-    $Logs = Get-EventLog system -ComputerName -UserName $User $HostName -source Microsoft-Windows-Winlogon -After (Get-Date).AddDays(-1);
+    $Logs = Get-EventLog system -ComputerName $env:computername -UserName $User -source Microsoft-Windows-Winlogon -After (Get-Date).AddDays(-1);
 
     $Result = @() 
 
