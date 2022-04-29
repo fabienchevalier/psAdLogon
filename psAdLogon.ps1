@@ -50,8 +50,38 @@ Function psAllLastLogon{
 
 # - Check all AD's users logon history
 Function psAllLogon {
-    Clear-Host
-    Write-Host "Gathering Event Logs on $env:computername, this could take a while..."
+    Write-Host -ForegroundColor Yellow "Gathering Event Logs on $env:computername, this could take a while..."
+    $Logs = Get-EventLog System -Source Microsoft-Windows-WinLogon -After (Get-Date).AddDays(-1) -ComputerName $env:computername
+    $Result = @() 
+    If ($Logs)
+        { 
+            Write-Host "Processing..."
+            ForEach ($Log in $Logs)
+            { 
+                If ($Log.InstanceId -eq 7001)
+                    {
+                        $ET = "Logon"
+                    }
+                ElseIf ($Log.InstanceId -eq 7002)
+                    { 
+                        $ET = "Logoff"
+                    }
+                Else
+                    { 
+                    Continue
+                    }
+                $Result += New-Object PSObject -Property @{Time = $log.TimeWritten; "Event Type" = $ET; 
+                User = (New-Object System.Security.Principal.SecurityIdentifier $Log.ReplacementStrings[1]).Translate([System.Security.Principal.NTAccount]) #<- On peut sûrement récupérer le user via ici
+                }
+            }
+            $Result | Select-Object Time,"Event Type",User | Sort Time -Descending | Where-Object {$_ -like $User} | Out-GridView
+            Write-Host -ForegroundColor Green "Done."
+        }
+}
+    
+# - Check one AD user logon history
+Function psAdLogon {
+    Write-Host -ForegroundColor Yellow "Gathering Event Logs on $env:computername, this could take a while..."
     $Logs = Get-EventLog System -Source Microsoft-Windows-WinLogon -After (Get-Date).AddDays(-1) -ComputerName $env:computername
     $Result = @() 
     If ($Logs)
@@ -76,44 +106,9 @@ Function psAllLogon {
                 }
             }
             $Result | Select-Object Time,"Event Type",User | Sort Time -Descending | Out-GridView
-            Write-Host "Done."
+            Write-Host -ForegroundColor Green "Done."
         }
 }
-    
-# - Check one AD user logon history
-Function psAdLogon {
-    $DCs = Get-ADDomainController -Filter *
-    $HostName = $DCs.HostName
-
-    ## Get SystemLog
-    $Logs = Get-EventLog system -ComputerName $env:computername -UserName $User -source Microsoft-Windows-Winlogon -After (Get-Date).AddDays(-1);
-
-    $Result = @() 
-
-    ForEach ($log in $logs) {
-
-        If($log.instanceid -eq 7001) {
-        
-            $type = "Logon"
-
-        } 
-
-        Elseif ($log.instanceid -eq 7002){
-    
-          $type="Logoff"
-
-        } 
-
-        Else {
-            Continue
-        } 
-
-        $Result += New-Object PSObject -Property @{Time = $log.TimeWritten; "Event" = $type; 
-                User = (New-Object System.Security.Principal.SecurityIdentifier $Log.ReplacementStrings[1]).Translate([System.Security.Principal.NTAccount])
-        }
-    }
-}
-
 
 ## -- Check if param is correctly set
 
