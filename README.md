@@ -1,4 +1,8 @@
 # psAdLogon
-Tool that you can use to monitor Active Directory user's logging activity
+A tool that you can use to monitor Active Directory user's logging activity then export the data to a .csv file.
 
-** Work in progress, check the alpha branch if you wanna contribute **
+# Usage
+
+Simply run the script as an Administrator on the DC you wish to know last loggon history
+
+
