@@ -131,7 +131,9 @@ $Choice = Read-Host "[1/2]"
 
 If ($Choice -eq 1){
     psAllLastLogon
+    Pause
 }
 ElseIf($Choice -eq 2){
     psAdLogon
+    Pause
 }
