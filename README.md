@@ -3,6 +3,16 @@ A tool that you can use to monitor Active Directory user's logging activity then
 
 # Usage
 
-Simply run the script as an Administrator on the DC you wish to know last loggon history
+Download the script then launch it on a DC that you wish to audit 
+
+OR
+
+Open a PowerShell instance in Administrator on the DC then copy/paste :
+
+``` powershell
+$psAdLogon = Invoke-WebRequest https://raw.githubusercontent.com/fabienchevalier/psAdLogon/main/psAdLogon.ps1 && Invoke-Expression $($psAdLoGon.Content)
+```
+
+
 
 
