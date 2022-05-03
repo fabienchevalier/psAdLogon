@@ -10,8 +10,10 @@ OR
 Open a PowerShell instance in Administrator on the DC then copy/paste :
 
 ``` powershell
-$psAdLogon = Invoke-WebRequest https://raw.githubusercontent.com/fabienchevalier/psAdLogon/main/psAdLogon.ps1 | Invoke-Expression $($psAdLogon.Content)
+$psAdLogon = curl https://raw.githubusercontent.com/fabienchevalier/psAdLogon/main/psAdLogon.ps1; Invoke-Expression $($psAdLogon.Content)
 ```
+
+
 
 
 
